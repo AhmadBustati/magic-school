@@ -9,7 +9,7 @@ It has two mobile : one for the teacher, and the other for  the parents. Develop
 *  Contact the parent for a specific problem.
 *  Send a student's activity relative to the student's behavior that day. 
 *  View a calander showing his/her lessons.
-*  Genrate a question using a neural network explained furhter [here](## Neural Networks)
+*  Genrate a question using a neural network explained furhter [here](## Neural-Networks)
 ### The parent can : 
 * View notifications sent by the school either specific to the child(scored poorly on a quiz), or genral(there will be next sunday)
 * Send homework requested by a teacher 
