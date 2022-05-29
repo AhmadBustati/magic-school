@@ -42,7 +42,3 @@ class ProfileViewSet(ModelViewSet, GenericViewSet):
         return queryset
 
 
-class FeedbackViewSet(ModelViewSet, GenericViewSet):
-    permission_classes = [IsAuthenticated]
-    queryset = Feedback.objects.all()
-    serializer_class = FeedbackSerializer
