@@ -1,6 +1,4 @@
-===============================
-magic_school
-===============================
+# magic_school
 
 .. image:: https://badge.fury.io/py/school.png
     :target: http://badge.fury.io/py/school
