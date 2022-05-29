@@ -1,5 +1,6 @@
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
-from .models import Classroom, Feedback, Holiday, Post, Profile
+from .models import Classroom, Feedback, Holiday, 
+from .models import Post, Profile
 from .serializers import ClassroomSerializer, HolidaySerializer, PostSerializer, ProfileSerializer, FeedbackSerializer
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
