@@ -1,9 +1,14 @@
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
-from .models import Classroom, Feedback, Holiday,  Post, Profile
+from .models import Classroom, Feedback, Holiday, Post, Profile
 from .serializers import ClassroomSerializer, HolidaySerializer, PostSerializer, ProfileSerializer, FeedbackSerializer
+
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 from django.contrib.auth import get_user_model
+
+from django.http.response import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from rest_framework.parsers import JSONParser
 
 User = get_user_model()
 
@@ -37,14 +42,13 @@ class ProfileViewSet(ModelViewSet, GenericViewSet):
 
     def get_queryset(self):  # for get all teachers or employees
         queryset = super(ProfileViewSet, self).get_queryset()
+        
         if self.request.GET.get('type'):
             return queryset.filter(user__account_type=self.request.GET.get('type'))
         return queryset
 
-        
+
 class FeedbackViewSet(ModelViewSet, GenericViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
-
-

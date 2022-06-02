@@ -3,6 +3,10 @@ from .views import (
     StudentViewSet,
     SubjectViewSet,
     MarkViewset,
+    AvaregViews,
+    HomeworkTeacherViewsSet,
+    HomeworkStudentViewSet,
+    DailyLessonsViewSit,
 )
 from rest_framework import routers
 
@@ -12,5 +16,9 @@ router = routers.DefaultRouter()
 router.register("student", StudentViewSet)
 router.register("subject",SubjectViewSet)
 router.register("mark",MarkViewset)
+router.register("Avareg",AvaregViews)
+router.register("homeworkteacher",HomeworkTeacherViewsSet)
+router.register("homeworkStudent",HomeworkStudentViewSet)
+router.register("dailyLessones",DailyLessonsViewSit)
 urlpatterns = router.urls
 

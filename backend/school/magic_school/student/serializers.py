@@ -4,7 +4,7 @@ from pyexpat import model
 from rest_framework import serializers
 
 #from school.magic_school.manager.models import Classroom , Profile
-from .models import Student,Subject,Mark
+from .models import HomeworkTeacher, Student,Subject,Mark,HomeWorkStudent,DailyLessons
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -57,4 +57,40 @@ class MarkSerializer(serializers.ModelSerializer):
             "mark",
             "fullmark",
         )
-    
+
+
+class HomeWorkeTeacherSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=HomeworkTeacher
+        fields=(
+            "id",
+            "classroom",
+            "subject",
+            "teacher",
+            "description",
+            "date",
+            "pdf_from_teacher",
+        )
+
+class HomeWorkeStudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=HomeWorkStudent
+        fields=(
+            "id",
+            "student",
+            "homework",
+            "status",
+            "pdf_from_student",
+        )
+
+class DailyLessonsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=DailyLessons
+        fields=(
+            "id",
+            "className",
+            "day",
+            "period",
+            "subject",
+            "teacher",
+        )        

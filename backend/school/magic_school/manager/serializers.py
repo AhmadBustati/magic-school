@@ -70,3 +70,6 @@ class FeedbackSerializer(serializers.ModelSerializer):
             "text",
             "user",
         )
+
+
+

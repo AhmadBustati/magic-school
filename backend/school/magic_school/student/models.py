@@ -1,4 +1,5 @@
 from django.db import models
+from manager.models import Profile
 
 from manager.models import Classroom
 from phonenumber_field.modelfields import PhoneNumberField
@@ -8,7 +9,7 @@ User = get_user_model()
 
 
 class Student(models.Model):
-
+    
     F = "female"
     M = "male"
 
@@ -67,17 +68,16 @@ class Mark(models.Model):
 
 class DailyLessons(models.Model):
     Sun = 'sunday'
-    Month = 'monday'
+    Mon = 'monday'
     Tus = 'tuesday'
     Wed = 'wensday'
-    Thu = 'thursday'
-    First = 'first'
+    Ther = 'thursday'
     DAYS = (
-        ('1', 'sunday'),
-        ('2', 'monday'),
-        ('3', 'tuesday'),
-        ('4', 'wensday'),
-        ('5', 'thursday'),
+        (Sun, '1'),
+        (Mon, '2'),
+        (Tus, '3'),
+        (Wed, '4'),
+        (Ther, '5'),
     )
     one = 'first'
     two = 'second'
@@ -97,5 +97,41 @@ class DailyLessons(models.Model):
     )
     className = models.ForeignKey(Classroom, on_delete=models.CASCADE)
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    teacher=models.ForeignKey(
+        Profile,
+        related_name="teacher_daelylessons",
+        on_delete=models.CASCADE,
+        limit_choices_to={"user__account_type":User.Teacher}
+    )
     day = models.CharField(choices=DAYS, max_length=30)
     period = models.CharField(choices=PERIOD, max_length=30)
+
+
+
+class HomeworkTeacher(models.Model):
+    classroom=models.ForeignKey(
+        Classroom,
+        related_name="classroom_homeworkteacher",
+        on_delete=models.CASCADE,
+    )
+    subject=models.ForeignKey(
+        Subject,
+        related_name="subject_homeworkteacher",
+        on_delete=models.CASCADE,
+    )
+    teacher=models.ForeignKey(
+        Profile,
+        related_name="teacher_homeworkteacher",
+        on_delete=models.CASCADE,
+        limit_choices_to={"user__account_type":User.Teacher},
+    )
+    description=models.TextField()
+    date=models.DateField(auto_now=True)
+    pdf_from_teacher=models.FileField(upload_to="pdf_teacher/",null=True,blank=True) 
+
+class HomeWorkStudent(models.Model):
+    homework=models.ForeignKey(HomeworkTeacher,related_name="homework_homework",on_delete=models.CASCADE) 
+    student=models.ForeignKey(Student,related_name="student_homework",on_delete=models.CASCADE)
+    status=models.BooleanField()
+    pdf_from_student=models.FileField(upload_to="pdf_student/",null=True,blank=True)
+    
