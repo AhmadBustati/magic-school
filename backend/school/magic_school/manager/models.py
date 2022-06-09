@@ -20,7 +20,6 @@ class Profile(models.Model):
         (M, 'male'),
         (F, 'female'),
     )
-
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     father_name = models.CharField(max_length=30, null=True, blank=True)

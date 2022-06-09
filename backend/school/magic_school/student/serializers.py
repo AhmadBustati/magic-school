@@ -3,7 +3,9 @@ from dataclasses import fields
 from pyexpat import model
 from rest_framework import serializers
 
-#from school.magic_school.manager.models import Classroom , Profile
+from .models import Classroom 
+
+
 from .models import HomeworkTeacher, Student,Subject,Mark,HomeWorkStudent,DailyLessons
 from django.contrib.auth import get_user_model
 
@@ -33,7 +35,9 @@ class StudentSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         username = validated_data.pop('username')
         password = validated_data.pop('password')
-        user = User.objects.create(username=username, password=password, account_type=User.Student)
+        user = User(username=username, account_type=User.Student)
+        user.set_password(password)
+        user.save()
         validated_data['user'] = user
         obj = super(StudentSerializer, self).create(validated_data)
         return obj
@@ -45,6 +49,8 @@ class SubjectSerializer(serializers.ModelSerializer):
         fields="__all__"
 
 class MarkSerializer(serializers.ModelSerializer):
+    classroom=serializers.SlugRelatedField(many=False, slug_field="name",queryset=Classroom.objects.all())
+    subject=serializers.SlugRelatedField(many=False, slug_field="subject_name",queryset=Subject.objects.all())
     class Meta:
         model=Mark
         fields=(

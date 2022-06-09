@@ -54,8 +54,10 @@ class ProfileSerializer(serializers.ModelSerializer):
         username = validated_data.pop('username')
         password = validated_data.pop('password')
         account_type = validated_data.pop('account_type')
-        user = User.objects.create(
-            username=username, password=password, account_type=account_type)
+        user = User(
+            username=username,account_type=account_type)
+        user.set_password(password) 
+        user.save()       
         validated_data['user'] = user
         obj = super(ProfileSerializer, self).create(validated_data)
         return obj

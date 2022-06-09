@@ -52,8 +52,10 @@ class MarkViewset(ModelViewSet,GenericViewSet):
         if self.request.GET.get('student'):
             return queryset.filter(student=self.request.GET.get('student'))
         return queryset   
-
+    # def get_queryset(self):
+    #     return Mark.objects.filter(user=self.request.user)
         
+
 class AvaregViews(ModelViewSet,GeneratorExit):
     permission_classes = [IsAuthenticated]
     serializer_class = MarkSerializer
@@ -61,12 +63,9 @@ class AvaregViews(ModelViewSet,GeneratorExit):
     def get_queryset(self):
         queryset=super(AvaregViews,self).get_queryset()
         if self.request.GET.get('student') and self.request.GET.get('subject'):
-            # sum_mark=queryset.filter(student=self.request.GET.get('student'),subject=self.request.GET.get('subject')).aggregate(Sum("mark"))
-            # print("***************************************",sum_mark)
-            # sum_fullmark=queryset.filter(student=self.request.GET.get('student'),subject=self.request.GET.get('subject')).aggregate(Sum("fullmark"))
-            # print("***************************************",sum_fullmark)
-            # average_mark=(mark__sum/fullmark__sum)*100
-            # print("***************************************",average_mark)
+            summ=queryset.filter(student=self.request.GET.get('student'),subject=self.request.GET.get('subject')).aggregate(aver=(Sum("mark")/Sum("fullmark"))*100)
+
+            print("***************************************",summ)
             return queryset.filter(student=self.request.GET.get('student'),subject=self.request.GET.get('subject'))          
         return  queryset  
                
