@@ -1,6 +1,6 @@
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
-from .models import Classroom, Feedback, Holiday, Post, Profile
-from .serializers import ClassroomSerializer, HolidaySerializer, PostSerializer, ProfileSerializer, FeedbackSerializer
+from .models import Classroom, Feedback, Holiday, Post, Profile,Message
+from .serializers import ClassroomSerializer, HolidaySerializer, PostSerializer, ProfileSerializer, FeedbackSerializer,MessageSerializer
 
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
@@ -26,6 +26,9 @@ class HolidayViewSet(ModelViewSet, GenericViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Holiday.objects.all()
     serializer_class = HolidaySerializer
+    def perform_create(self, serializer):
+        user=self.request.user  
+        instance = serializer.save(head_teacher=User.objects.get(id=user.id))    
 
 
 class ClassroomViewSet(ModelViewSet, GenericViewSet):
@@ -52,3 +55,34 @@ class FeedbackViewSet(ModelViewSet, GenericViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Feedback.objects.all()
     serializer_class = FeedbackSerializer
+
+
+class MessageViewSet(ModelViewSet, GenericViewSet):
+    ermission_classes = [IsAuthenticated]
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer
+    ################ sender with authentication ###########################
+    def perform_create(self, serializer):
+        user=self.request.user  
+        instance = serializer.save(sender=User.objects.get(id=user.id))
+
+    ################ get message by user authentication ###########################    
+    def get_queryset(self):
+        queryset=super(MessageViewSet,self).get_queryset()
+        if self.request.GET.get("person"):
+            user=self.request.user
+            userMessage=Message.objects.filter(
+                Q(sender=User.objects.get(id=user.id))|Q(receiver=User.objects.get(id=user.id))
+                )
+
+            return userMessage.filter(
+                Q(sender=self.request.GET.get("person"))|Q(receiver=self.request.GET.get("person")))
+        else:    
+            user=self.request.user  
+            return Message.objects.filter(
+                Q(sender=User.objects.get(id=user.id))|Q(receiver=User.objects.get(id=user.id))
+                )
+
+
+
+

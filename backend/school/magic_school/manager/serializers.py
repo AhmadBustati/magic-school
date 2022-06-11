@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Classroom, Feedback, Holiday, Post, Profile
+from .models import Classroom, Feedback, Holiday, Post, Profile,Message
 
 from django.contrib.auth import get_user_model
 
@@ -74,4 +74,16 @@ class FeedbackSerializer(serializers.ModelSerializer):
         )
 
 
+class MessageSerializer(serializers.ModelSerializer):
+    """For Serializing Message"""
+    sender = serializers.SlugRelatedField(many=False, slug_field='username', queryset=User.objects.all(),required=False)
+    receiver = serializers.SlugRelatedField(many=False, slug_field='username', queryset=User.objects.all())
+    class Meta:
+        model = Message
+        fields = (
+            "sender",
+            'receiver',
+            'message',
+            'timestamp',
+            )
 

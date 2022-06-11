@@ -62,9 +62,14 @@ class Post(TimeStampedModel):
 
 class Holiday(TimeStampedModel):
     day = models.DateField()
-    description = models.TextField(null=True, blank=True)
+    description = models.TextField(null=True,blank=True)
     name_of_holiday = models.CharField(max_length=255)
-
+    head_teacher=models.ForeignKey(
+        User,
+        related_name="Holiday_profile",
+        on_delete=models.CASCADE,
+        limit_choices_to={"account_type": User.Manager},
+    )
     def __str__(self):
         return self.name_of_holiday
 
@@ -84,3 +89,16 @@ class Feedback(models.Model):
     )
     type = models.CharField(choices=TYPE, max_length=20)
     text = models.TextField()
+
+
+
+class Message(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender')        
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receiver')        
+    message = models.CharField(max_length=1200)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+    def __str__(self):
+          return self.message
+    class Meta:
+          ordering = ('timestamp',)

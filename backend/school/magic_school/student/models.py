@@ -101,7 +101,7 @@ class DailyLessons(models.Model):
         Profile,
         related_name="teacher_daelylessons",
         on_delete=models.CASCADE,
-        limit_choices_to={"user__account_type":User.Teacher}
+        limit_choices_to={"user__account_type":User.Teacher},
     )
     day = models.CharField(choices=DAYS, max_length=30)
     period = models.CharField(choices=PERIOD, max_length=30)
@@ -127,11 +127,16 @@ class HomeworkTeacher(models.Model):
     )
     description=models.TextField()
     date=models.DateField(auto_now=True)
-    pdf_from_teacher=models.FileField(upload_to="pdf_teacher/",null=True,blank=True) 
+    pdf_from_teacher=models.FileField(upload_to="pdf_teacher/",null=True,blank=True,) 
 
 class HomeWorkStudent(models.Model):
     homework=models.ForeignKey(HomeworkTeacher,related_name="homework_homework",on_delete=models.CASCADE) 
-    student=models.ForeignKey(Student,related_name="student_homework",on_delete=models.CASCADE)
+    student=models.ForeignKey(
+                                Student,
+                                related_name="student_homework",
+                                on_delete=models.CASCADE,
+                                limit_choices_to={"user__account_type":User.Student},
+                                )
     status=models.BooleanField()
     pdf_from_student=models.FileField(upload_to="pdf_student/",null=True,blank=True)
     

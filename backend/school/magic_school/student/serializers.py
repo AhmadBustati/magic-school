@@ -1,9 +1,10 @@
 from asyncore import write
+from cProfile import Profile
 from dataclasses import fields
 from pyexpat import model
 from rest_framework import serializers
 
-from .models import Classroom 
+from .models import Classroom ,Profile
 
 
 from .models import HomeworkTeacher, Student,Subject,Mark,HomeWorkStudent,DailyLessons
@@ -64,32 +65,48 @@ class MarkSerializer(serializers.ModelSerializer):
             "fullmark",
         )
 
+class AverageSerializer(serializers.ModelSerializer):
+    average=serializers.IntegerField()
+    subject=serializers.SlugRelatedField(many=False, slug_field="subject_name",queryset=Subject.objects.all())
+    class Meta:
+        model=Mark
+        fields=(
+            "subject",
+            "average",
+        )
+
+
 
 class HomeWorkeTeacherSerializer(serializers.ModelSerializer):
+    classroom=serializers.SlugRelatedField(many=False, slug_field="name",queryset=Classroom.objects.all())
+    subject=serializers.SlugRelatedField(many=False, slug_field="subject_name",queryset=Subject.objects.all())
     class Meta:
         model=HomeworkTeacher
         fields=(
             "id",
             "classroom",
             "subject",
-            "teacher",
             "description",
             "date",
             "pdf_from_teacher",
         )
 
 class HomeWorkeStudentSerializer(serializers.ModelSerializer):
+# post وما بدي ادخلو بال get هون بدي رقم الطالب بس ينعرض بال 
     class Meta:
         model=HomeWorkStudent
         fields=(
             "id",
-            "student",
             "homework",
+            "student",
             "status",
             "pdf_from_student",
         )
 
 class DailyLessonsSerializer(serializers.ModelSerializer):
+    className=serializers.SlugRelatedField(many=False, slug_field="name",queryset=Classroom.objects.all())
+    subject=serializers.SlugRelatedField(many=False, slug_field="subject_name",queryset=Subject.objects.all())
+    teacher=serializers.SlugRelatedField(many=False, slug_field="id",queryset=Profile.objects.filter(user__account_type="Teacher"))
     class Meta:
         model=DailyLessons
         fields=(

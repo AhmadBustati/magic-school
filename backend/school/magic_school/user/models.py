@@ -43,3 +43,5 @@ class User(AbstractUser):
     def get_absolute_url(self):
         return reverse("user:detail", kwargs={"username": self.username})
  
+
+ 
