@@ -21,7 +21,7 @@ It has two mobile : one for the teacher, and the other for  the parents. Develop
 * View the activty of the student 
 
 ## Dashboard for the school administration 
-Same interface with different access to either the headmaster or an employee with administrative access. Developed with JavaScript by []()
+Same interface with different access to either the headmaster or an employee with administrative access. Developed with JavaScript by [Hadeel](https://github.com/HadeelKanas)
 ### The employee can :
 * 
 
