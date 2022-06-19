@@ -9,7 +9,6 @@ User = get_user_model()
 
 
 class Student(models.Model):
-    
     F = "female"
     M = "male"
 
@@ -35,6 +34,8 @@ class Student(models.Model):
     )
     classroom = models.ForeignKey(
         Classroom, related_name='student_classroom', on_delete=models.CASCADE)
+    
+    
     def __str__(self):
         return self.first_name
 
@@ -43,6 +44,13 @@ class Subject(models.Model):
 
     def __str__(self):
         return self.subject_name
+
+
+
+
+
+
+
 
 
 class Mark(models.Model):

@@ -3,7 +3,7 @@ from cProfile import Profile
 from dataclasses import fields
 from pyexpat import model
 from rest_framework import serializers
-
+from django.db.models import Avg, Max, Min, Sum
 from .models import Classroom ,Profile
 
 
@@ -66,8 +66,8 @@ class MarkSerializer(serializers.ModelSerializer):
         )
 
 class AverageSerializer(serializers.ModelSerializer):
-    average=serializers.IntegerField()
-    subject=serializers.SlugRelatedField(many=False, slug_field="subject_name",queryset=Subject.objects.all())
+    average=serializers.SerializerMethodField()
+    subject=serializers.SerializerMethodField()
     class Meta:
         model=Mark
         fields=(
@@ -75,7 +75,16 @@ class AverageSerializer(serializers.ModelSerializer):
             "average",
         )
 
+    def get_average(self,obj):
+        avg=Mark.objects.filter(
+            student=self.context["student"],
+            subject=self.context["subject"]).aggregate(avge=(Sum("mark")/Sum("fullmark"))*100).get("avge",0.00)  
+        return avg
+    def get_subject(self,obj):
+        obj=Subject.objects.get(id=self.context["subject"])
+        return obj.subject_name
 
+        
 
 class HomeWorkeTeacherSerializer(serializers.ModelSerializer):
     classroom=serializers.SlugRelatedField(many=False, slug_field="name",queryset=Classroom.objects.all())

@@ -1,5 +1,9 @@
 from cProfile import Profile
+from telnetlib import STATUS
+from unicodedata import name
+# from matplotlib.style import context
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from yaml import serialize
 from .models import Classroom, HomeWorkStudent,Profile
 from .models import Student,Subject,Mark,HomeworkTeacher,DailyLessons
 from django.http import Http404
@@ -12,10 +16,13 @@ from .serializers import (
                             HomeWorkeStudentSerializer,
                             DailyLessonsSerializer,
                             AverageSerializer,
+                            
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
+from django.views.decorators.csrf import csrf_exempt
+from django.http import HttpResponse,JsonResponse
+from rest_framework import status
 from django.db.models import Avg, Max, Min, Sum
 
 
@@ -59,22 +66,28 @@ class MarkViewset(ModelViewSet,GenericViewSet):
         user=self.request.user  
         stu=Student.objects.get(user_id=user)
         return Mark.objects.filter(student_id=stu.id)
-        
+
+ 
+
 
 class AvaregViews(ModelViewSet,GeneratorExit):
     permission_classes = [IsAuthenticated]
-    serializer_class =MarkSerializer
     queryset=Mark.objects.all()
+    serializer_class =AverageSerializer
+    
+
+    def get_serializer_context(self):
+        return {"student":self.request.GET.get('student'),"subject":self.request.GET.get('subject') }
+
+
     def get_queryset(self):
         queryset=super(AvaregViews,self).get_queryset()
         if self.request.GET.get('student') and self.request.GET.get('subject'):
-            dev=queryset.filter(student=self.request.GET.get('student'),
+            queryset=queryset.filter(student=self.request.GET.get('student'),
                                         subject=self.request.GET.get('subject'),
-                                        ).aggregate(aver=(Sum("mark")/Sum("fullmark"))*100)   
-            print("#############################",dev)                                                     
-            return  queryset.filter(student=self.request.GET.get('student'),
-                                        subject=self.request.GET.get('subject'),
-                                        )        
+                                        )
+            #.aggregate(avge=(Sum("mark")/Sum("fullmark"))*100).get("avge",0.00)                            
+            return  queryset      
         return  queryset  
                
                           
