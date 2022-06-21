@@ -47,9 +47,9 @@ class ProfileSerializer(serializers.ModelSerializer):
             'username',
             'password',
             "account_type",
-
+            "user",
         )
-
+        depth=1
     def create(self, validated_data):
         username = validated_data.pop('username')
         password = validated_data.pop('password')

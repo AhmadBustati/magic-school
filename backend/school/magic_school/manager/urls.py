@@ -11,7 +11,7 @@ from .views import (
     TeacherNumber,
 )
 from rest_framework import routers
-from django.urls import path
+from django.urls import path,include
 
 app_name = "manager_api"
 
@@ -23,8 +23,10 @@ router.register("profile", ProfileViewSet)
 router.register("feedback", FeedbackViewSet)
 router.register("message", MessageViewSet)
 
-urlpatterns = router.urls
+# urlpatterns = router.urls
+
 urlpatterns =[
+    path("",include(router.urls)),
     path("AdminNumber/",AdminNumber),
     path("StudentNumber/",StudentNumber),
     path("TeacherNumber/",TeacherNumber),

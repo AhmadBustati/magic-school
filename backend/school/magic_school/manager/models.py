@@ -30,7 +30,7 @@ class Profile(models.Model):
     phone = PhoneNumberField(null=True, blank=True, unique=True)
     title = models.CharField(max_length=30, null=True, blank=True)
     classroom = models.ForeignKey(
-        Classroom, related_name='teacher_classroom', on_delete=models.CASCADE)
+        Classroom, related_name='teacher_classroom', on_delete=models.CASCADE,null=True,blank=True)
     photo = models.ImageField(upload_to='photo', null=True, blank=True)
     user = models.ForeignKey(
         User,

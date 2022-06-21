@@ -66,7 +66,6 @@ class ProfileViewSet(ModelViewSet, GenericViewSet):
 
     def get_queryset(self):  # for get all teachers or employees
         queryset = super(ProfileViewSet, self).get_queryset()
-        
         if self.request.GET.get('type'):
             return queryset.filter(user__account_type=self.request.GET.get('type'))
         return queryset

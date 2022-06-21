@@ -30,6 +30,7 @@ class StudentViewSet(ModelViewSet, GenericViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
+    
     def get_serializer_context(self):
         return {"student":self.request.GET.get('student')}
 
@@ -38,7 +39,6 @@ class StudentViewSet(ModelViewSet, GenericViewSet):
         if self.request.GET.get('student'):
             return queryset.filter(id=self.request.GET.get('student'))
         return queryset
-    
     
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
@@ -51,6 +51,9 @@ class StudentViewSet(ModelViewSet, GenericViewSet):
             queryset = queryset.filter(classroom=classroom)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    
+            
 
 class SubjectViewSet(ModelViewSet,GenericViewSet):
     permission_classes = [IsAuthenticated]

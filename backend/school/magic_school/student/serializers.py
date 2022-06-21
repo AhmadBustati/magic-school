@@ -15,6 +15,7 @@ User = get_user_model()
 class StudentSerializer(serializers.ModelSerializer):
     username = serializers.CharField(write_only=True)
     password = serializers.CharField(write_only=True)
+    classroom=serializers.SlugRelatedField(many=False, slug_field="name",queryset=Classroom.objects.all())
     class Meta:
         model = Student
         fields = (
@@ -29,7 +30,6 @@ class StudentSerializer(serializers.ModelSerializer):
             "phone",
             "photo",
             'classroom',
-            "user",
             'username',
             'password',
             )
@@ -45,12 +45,35 @@ class StudentSerializer(serializers.ModelSerializer):
         return obj
     
     
-    # def get_username(self,obj):
-    #     obj=Student.objects.get(id=self.context["student"]).user.username
-    #     return obj
-    # def get_password(self,obj):
-    #     obj=Student.objects.get(id=self.context["student"]).user.password
-    #     return obj
+    
+# class StudentSerializerGET(serializers.ModelSerializer):
+#     username = serializers.SerializerMethodField()
+#     password = serializers.SerializerMethodField()
+#     classroom=serializers.SlugRelatedField(many=False, slug_field="name",queryset=Classroom.objects.all())
+#     class Meta:
+#         model = Student
+#         fields = (
+#             "id",
+#             "first_name", 
+#             "last_name",
+#             "father_name",
+#             "mother_name",
+#             "birthday",
+#             "gender",
+#             "age",
+#             "phone",
+#             "photo",
+#             'classroom',
+#             'username',
+#             'password',
+#             )
+
+#     def get_username(self,obj):
+#         obj=Student.objects.get(id=self.context["student"]).user.username
+#         return obj
+#     def get_password(self,obj):
+#         obj=Student.objects.get(id=self.context["student"]).user.password
+#         return obj
 
 
 class SubjectSerializer(serializers.ModelSerializer):
