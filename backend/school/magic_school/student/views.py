@@ -30,19 +30,25 @@ class StudentViewSet(ModelViewSet, GenericViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Student.objects.all()
     serializer_class = StudentSerializer
+    def get_serializer_context(self):
+        return {"student":self.request.GET.get('student')}
 
+    def get_queryset(self):
+        queryset=super(StudentViewSet,self).get_queryset()
+        if self.request.GET.get('student'):
+            return queryset.filter(id=self.request.GET.get('student'))
+        return queryset
+    
+    
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         if request.GET.get("classroom"):
             class_id = request.GET.get("classroom")
-            
             try:
                 classroom = Classroom.objects.get(pk=class_id)
-                
             except Classroom.DoesNotExist:
                 raise Http404("classroom does not exist")
             queryset = queryset.filter(classroom=classroom)
-
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
 

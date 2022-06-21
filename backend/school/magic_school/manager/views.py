@@ -12,6 +12,27 @@ from rest_framework.parsers import JSONParser
 
 User = get_user_model()
 
+def AdminNumber(request):
+    dd=str(User.objects.filter(account_type="employee").count())
+    response={
+        "number":dd
+    }
+    return JsonResponse(response)
+
+def StudentNumber(request):
+    dd=str(User.objects.filter(account_type="student").count())
+    response={
+        "number":dd
+    }
+    return JsonResponse(response)
+
+def TeacherNumber(request):
+    dd=str(User.objects.filter(account_type="teacher").count())
+    response={
+        "number":dd
+    }
+    return JsonResponse(response)    
+
 
 class PostViewSet(ModelViewSet, GenericViewSet):
     permission_classes = [IsAuthenticated]

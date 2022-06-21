@@ -11,8 +11,8 @@ import os
 
 ########## PATH CONFIGURATION
 BASE_DIR = dirname(dirname(__file__) + "../../../")
-FACENET_DIR = join(BASE_DIR,'neural networks/face_recognition/facenet_keras.h5')
-
+FACENET_DIR = join(BASE_DIR,'neural networks/face_recognition')
+#/facenet_keras.h5
 # Absolute filesystem path to the config directory:
 
 CONFIG_ROOT = dirname(dirname(abspath(__file__)))

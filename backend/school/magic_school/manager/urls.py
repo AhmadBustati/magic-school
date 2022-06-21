@@ -6,7 +6,9 @@ from .views import (
     PostViewSet,
     ProfileViewSet,
     MessageViewSet,
-
+    AdminNumber,
+    StudentNumber,
+    TeacherNumber,
 )
 from rest_framework import routers
 from django.urls import path
@@ -22,4 +24,8 @@ router.register("feedback", FeedbackViewSet)
 router.register("message", MessageViewSet)
 
 urlpatterns = router.urls
-
+urlpatterns =[
+    path("AdminNumber/",AdminNumber),
+    path("StudentNumber/",StudentNumber),
+    path("TeacherNumber/",TeacherNumber),
+]

@@ -29,10 +29,11 @@ class StudentSerializer(serializers.ModelSerializer):
             "phone",
             "photo",
             'classroom',
+            "user",
             'username',
             'password',
             )
-
+        depth=1
     def create(self, validated_data):
         username = validated_data.pop('username')
         password = validated_data.pop('password')
@@ -42,6 +43,14 @@ class StudentSerializer(serializers.ModelSerializer):
         validated_data['user'] = user
         obj = super(StudentSerializer, self).create(validated_data)
         return obj
+    
+    
+    # def get_username(self,obj):
+    #     obj=Student.objects.get(id=self.context["student"]).user.username
+    #     return obj
+    # def get_password(self,obj):
+    #     obj=Student.objects.get(id=self.context["student"]).user.password
+    #     return obj
 
 
 class SubjectSerializer(serializers.ModelSerializer):
