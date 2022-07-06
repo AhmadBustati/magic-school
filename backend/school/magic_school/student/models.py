@@ -1,11 +1,57 @@
 from django.db import models
 from manager.models import Profile
-
 from manager.models import Classroom
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth import get_user_model
+from PIL import Image
+import numpy as np 
+from mtcnn.mtcnn import MTCNN
+from .apps import StudentConfig
 
 User = get_user_model()
+class face_recognition:
+    def __init__(self):
+        self.model = StudentConfig.face_net
+        self.detector = MTCNN()
+
+    def crop_face(self,image):
+        result = self.detector.detect_faces(image)
+        if len(result) == 0:
+            return None
+        x,y,w,h = result[0]['box']
+        return image[y:y+h,x:x+w]
+
+    def resize_image(self,image):
+        image = Image.fromarray(image)
+        image = image.resize((160,160))
+        return np.array(image)
+
+    def get_face_features(self,image,recognized=False):
+        if not recognized :
+            image = self.crop_face(image)
+        if image is None:
+            return None
+        image = self.resize_image(image)
+        image = image/255.0
+        image = np.expand_dims(image,axis=0)
+        face_features = self.model.predict(image)[0]
+        face_features/=np.linalg.norm(face_features)
+        return face_features
+
+    def recognize_face(self,image,queryset):
+        face_features = self.get_face_features(image,recognized=True)
+        diff = 100
+        for i in range(len(queryset)):
+            im = np.asarray(queryset[i].face_encoding["features"])
+            a = np.linalg.norm(im-face_features)
+            if a<diff:
+                diff = a
+                name = queryset[i].id
+
+        if diff>0.8 :
+            return "not recognized"
+        else : 
+            return f"it's {name} with confidence: {diff}"
 
 
 class Student(models.Model):
@@ -34,6 +80,14 @@ class Student(models.Model):
     )
     classroom = models.ForeignKey(
         Classroom, related_name='student_classroom', on_delete=models.CASCADE)
+    _face_features  = models.JSONField(null=True,blank=True)
+   
+    def save(self,*args,**kwargs):
+        im = Image.open(self.photo)
+        image = np.array(im)
+        get_face = face_recognition()
+        self._face_features= {"features":get_face.get_face_features(image).tolist()}
+        super(Student,self).save(*args,**kwargs)
     
     
     def __str__(self):

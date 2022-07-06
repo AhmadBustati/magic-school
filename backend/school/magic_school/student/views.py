@@ -26,6 +26,7 @@ from rest_framework import status
 from django.db.models import Avg, Max, Min, Sum
 
 
+
 class StudentViewSet(ModelViewSet, GenericViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Student.objects.all()
