@@ -102,3 +102,19 @@ class Message(models.Model):
           return self.message
     class Meta:
           ordering = ('timestamp',)
+
+class QuizName(models.Model):
+    name = models.CharField(max_length=100)
+    class_name = models.ForeignKey(Classroom, on_delete=models.CASCADE,null=True)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE,null=True)
+
+    def __str__(self):
+        return self.name
+
+
+class Question(models.Model):
+    question_text = models.CharField(max_length=512)
+    quiz = models.ForeignKey(QuizName, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.question_text

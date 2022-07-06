@@ -1,6 +1,7 @@
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
-from .models import Classroom, Feedback, Holiday, Post, Profile,Message
+from .models import Classroom, Feedback, Holiday, Post, Profile,Message,QuizName,Question
 from .serializers import ClassroomSerializer, HolidaySerializer, PostSerializer, ProfileSerializer, FeedbackSerializer,MessageSerializer
+from .apps import ManagerConfig
 
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
@@ -9,6 +10,8 @@ from django.contrib.auth import get_user_model
 from django.http.response import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 User = get_user_model()
 
@@ -103,6 +106,50 @@ class MessageViewSet(ModelViewSet, GenericViewSet):
                 Q(sender=User.objects.get(id=user.id))|Q(receiver=User.objects.get(id=user.id))
                 )
 
+
+
+class QuestionGenerator(APIView):
+    def post(self, request):
+        model = ManagerConfig.model
+        tokenizer = ManagerConfig.tokenizer
+        text = request.data.get('text')
+        profile = Profile.objects.get(id=request.data.get('profile_id'))
+        class_name = Classroom.objects.get(id=request.data.get('class_name_id'))
+        a = QuizName(
+            name=request.data.get('name'),
+            profile=profile,
+            class_name=class_name,
+        
+        )
+
+
+        a.save()
+
+        question_list = []
+        key="question"
+        for t in text :
+            input_ids, attention_mask = self.encode_text(t, tokenizer)
+            outputs = model.generate(input_ids,attention_mask=attention_mask)
+            question= tokenizer.decode(outputs[0],skip_special_tokens=True)
+            Question(question_text=question, quiz=a).save()
+            question_list.append(question)
+
+        response_dict = {}
+        response_dict.setdefault(key,question_list)
+       
+        return Response(response_dict)
+
+    def encode_text(self,text, tokenizer):
+        encoded_text = tokenizer(
+        text,
+        padding = "max_length",
+        max_length = 512,
+        truncation = True,
+        return_tensors = "tf"
+    )
+        input_ids = encoded_text["input_ids"]
+        attention_mask = encoded_text["attention_mask"]
+        return input_ids, attention_mask
 
 
 
