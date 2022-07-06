@@ -3,11 +3,13 @@ from telnetlib import STATUS
 from unicodedata import name
 # from matplotlib.style import context
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.views import APIView
 from yaml import serialize
-from .models import Classroom, HomeWorkStudent,Profile
+from .models import Classroom, HomeWorkStudent,Profile,face_recognition
 from .models import Student,Subject,Mark,HomeworkTeacher,DailyLessons
 from django.http import Http404
 from django.db.models import Q
+import numpy as np 
 from .serializers import (
                             StudentSerializer,
                             SubjectSerializer,
@@ -180,3 +182,13 @@ class DailyLessonsViewSit(ModelViewSet,GenericViewSet):
             obj=Student.objects.get(user_id=user.id)
             print("@@@@@@@@@@@@@@@@@",obj)  
             return queryset.filter(className=obj.classroom)
+
+class RecognizeFace(APIView):
+    def post(self,request):
+        im = request.data.get('face')
+        image = np.array(im)
+        recognizer = face_recognition()
+        queryset = Student.objects.all()
+        a = recognizer.recognize_face(image,queryset)
+        return Response(a)
+    

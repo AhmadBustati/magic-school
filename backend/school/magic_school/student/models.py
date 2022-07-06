@@ -42,7 +42,7 @@ class face_recognition:
         face_features = self.get_face_features(image,recognized=True)
         diff = 100
         for i in range(len(queryset)):
-            im = np.asarray(queryset[i].face_encoding["features"])
+            im = np.asarray(queryset[i]._face_features["features"])
             a = np.linalg.norm(im-face_features)
             if a<diff:
                 diff = a

@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path,include
 from django import views
 from .views import (
     StudentViewSet,
@@ -8,6 +8,7 @@ from .views import (
     HomeworkTeacherViewsSet,
     HomeworkStudentViewSet,
     DailyLessonsViewSit,
+    RecognizeFace,
 )
 from rest_framework import routers
 
@@ -21,5 +22,10 @@ router.register("Avareg",AvaregViews)
 router.register("homeworkteacher",HomeworkTeacherViewsSet)
 router.register("homeworkStudent",HomeworkStudentViewSet)
 router.register("dailyLessones",DailyLessonsViewSit)
-urlpatterns = router.urls
+# urlpatterns = router.urls
+
+urlpatterns =[
+    path("",include(router.urls)),
+    path("who/",include(RecognizeFace.as_view())),
+    ]
 
