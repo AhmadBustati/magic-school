@@ -26,6 +26,6 @@ router.register("dailyLessones",DailyLessonsViewSit)
 
 urlpatterns =[
     path("",include(router.urls)),
-    path("who/",include(RecognizeFace.as_view())),
+    path("who/",RecognizeFace.as_view()),
     ]
 
