@@ -6,6 +6,7 @@ from .views import (
     PostViewSet,
     ProfileViewSet,
     MessageViewSet,
+    QuestionGenerator,
     AdminNumber,
     StudentNumber,
     TeacherNumber,
@@ -30,4 +31,5 @@ urlpatterns =[
     path("AdminNumber/",AdminNumber),
     path("StudentNumber/",StudentNumber),
     path("TeacherNumber/",TeacherNumber),
+    path("generate/<int:id>/",QuestionGenerator.as_view())
 ]

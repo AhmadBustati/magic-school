@@ -9,6 +9,7 @@ from .views import (
     HomeworkStudentViewSet,
     DailyLessonsViewSit,
     RecognizeFace,
+    StudentAttendance
 )
 from rest_framework import routers
 
@@ -27,5 +28,6 @@ router.register("dailyLessones",DailyLessonsViewSit)
 urlpatterns =[
     path("",include(router.urls)),
     path("who/",RecognizeFace.as_view()),
+    path("student-attendance/<int:student_id>/",StudentAttendance)
     ]
 

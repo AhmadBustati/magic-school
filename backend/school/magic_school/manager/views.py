@@ -1,8 +1,20 @@
+from http.client import HTTPResponse
+from requests import delete
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from .models import Classroom, Feedback, Holiday, Post, Profile,Message,QuizName,Question
-from .serializers import ClassroomSerializer, HolidaySerializer, PostSerializer, ProfileSerializer, FeedbackSerializer,MessageSerializer
+from .serializers import (
+    ClassroomSerializer,
+     HolidaySerializer,
+      PostSerializer,
+       ProfileSerializer,
+        FeedbackSerializer,
+        MessageSerializer,
+        SerrializerManagerGET,
+        QuestionSerializer
+        )
 from .apps import ManagerConfig
-
+from rest_framework.filters import SearchFilter
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 from django.contrib.auth import get_user_model
@@ -61,18 +73,30 @@ class ClassroomViewSet(ModelViewSet, GenericViewSet):
     serializer_class = ClassroomSerializer
 
 
+
+
 class ProfileViewSet(ModelViewSet, GenericViewSet):
     permission_classes = [IsAuthenticated]
-    queryset = Profile.objects.filter(
-        Q(user__account_type=User.Employee) | Q(user__account_type=User.Teacher))
-    serializer_class = ProfileSerializer
+    queryset = Profile.objects.all()
+    filter_backends=[SearchFilter]
+    search_fields=["first_name","last_name"]
+    def get_serializer_class(self):
+        if self.action == 'retrieve' :
+            if self.kwargs["pk"]:
+                return SerrializerManagerGET 
+        return ProfileSerializer
+
+
+    def get_serializer_context(self):
+        if self.action == 'retrieve':
+            return {"profile":self.kwargs["pk"]}
+        return {"profile":""}
 
     def get_queryset(self):  # for get all teachers or employees
         queryset = super(ProfileViewSet, self).get_queryset()
         if self.request.GET.get('type'):
             return queryset.filter(user__account_type=self.request.GET.get('type'))
         return queryset
-
 
 class FeedbackViewSet(ModelViewSet, GenericViewSet):
     permission_classes = [IsAuthenticated]
@@ -121,23 +145,28 @@ class QuestionGenerator(APIView):
             class_name=class_name,
         
         )
-
-
         a.save()
-
-        question_list = []
         key="question"
         for t in text :
             input_ids, attention_mask = self.encode_text(t, tokenizer)
             outputs = model.generate(input_ids,attention_mask=attention_mask)
             question= tokenizer.decode(outputs[0],skip_special_tokens=True)
             Question(question_text=question, quiz=a).save()
-            question_list.append(question)
 
-        response_dict = {}
-        response_dict.setdefault(key,question_list)
-       
-        return Response(response_dict)
+        query = Question.objects.filter(quiz=a)
+        serializer = QuestionSerializer(query ,many=True)
+        return Response({"questions":serializer.data})
+
+    def delete(self,request,id):
+        question = self.get_object(id)
+        question.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+        
+    def get_object(self,id):
+        try:
+            return Question.objects.get(id=id)
+        except:
+            return HTTPResponse(status=status.HTTP_404_NOT_FOUND)
 
     def encode_text(self,text, tokenizer):
         encoded_text = tokenizer(

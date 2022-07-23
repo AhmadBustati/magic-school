@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Classroom, Feedback, Holiday, Post, Profile,Message
+from .models import Classroom, Feedback, Holiday, Post, Profile,Message,Question
 
 from django.contrib.auth import get_user_model
 
@@ -37,19 +37,17 @@ class ProfileSerializer(serializers.ModelSerializer):
             "last_name",
             "father_name",
             "certificates",
-            "title",
+            "job_title",
             "birthday",
             "gender",
-            "age",
             "phone",
             "photo",
-            'classroom',
             'username',
             'password',
             "account_type",
-            "user",
+            "address",
         )
-        depth=1
+        
     def create(self, validated_data):
         username = validated_data.pop('username')
         password = validated_data.pop('password')
@@ -62,7 +60,37 @@ class ProfileSerializer(serializers.ModelSerializer):
         obj = super(ProfileSerializer, self).create(validated_data)
         return obj
 
-
+class SerrializerManagerGET(serializers.ModelSerializer):
+    username = serializers.SerializerMethodField()
+    password = serializers.SerializerMethodField()
+    account_type=serializers.SerializerMethodField()
+    class Meta:
+        model = Profile
+        fields = (
+            "id",
+            "first_name",
+            "last_name",
+            "father_name",
+            "certificates",
+            "job_title",
+            "birthday",
+            "gender",
+            "phone",
+            "photo",
+            'username',
+            'password',
+            "account_type",
+            "address",
+        )
+    def get_username(self,obj):
+        obj=Profile.objects.get(id=self.context["profile"]).user.username
+        return obj
+    def get_password(self,obj):
+        obj=Profile.objects.get(id=self.context["profile"]).user.password
+        return obj
+    def get_account_type(self,obj):
+        obj=Profile.objects.get(id=self.context["profile"]).user.account_type
+        return obj  
 class FeedbackSerializer(serializers.ModelSerializer):
     class Meta:
         model = Feedback
@@ -86,4 +114,9 @@ class MessageSerializer(serializers.ModelSerializer):
             'message',
             'timestamp',
             )
+
+class QuestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Question
+        fields = ('id','question_text')
 

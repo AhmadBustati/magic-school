@@ -39,19 +39,23 @@ class face_recognition:
         return face_features
 
     def recognize_face(self,image,queryset):
-        face_features = self.get_face_features(image,recognized=True)
+        im = Image.open(image)
+        photo = np.array(im)
+        face_features = self.get_face_features(photo)
         diff = 100
         for i in range(len(queryset)):
+            if queryset[i]._face_features is None:
+                continue
             im = np.asarray(queryset[i]._face_features["features"])
             a = np.linalg.norm(im-face_features)
             if a<diff:
                 diff = a
-                name = queryset[i].id
+                id = queryset[i].id
 
         if diff>0.8 :
             return "not recognized"
         else : 
-            return f"it's {name} with confidence: {diff}"
+            return id
 
 
 class Student(models.Model):
@@ -66,11 +70,11 @@ class Student(models.Model):
     last_name = models.CharField(max_length=20)
     father_name = models.CharField(max_length=20, null=True, blank=True)
     mother_name = models.CharField(max_length=20, null=True, blank=True)
-    age = models.IntegerField()
     birthday = models.DateField()
     gender = models.CharField(choices=GENDER_TYPES, max_length=20, default=M)
     phone = PhoneNumberField(null=True, blank=True, unique=True)
     photo = models.ImageField(upload_to='photo', null=True, blank=True)
+    address = models.CharField(max_length=100,null=True,blank=True)
     user = models.ForeignKey(
         User,
         related_name="user_student",
@@ -201,4 +205,23 @@ class HomeWorkStudent(models.Model):
                                 )
     status=models.BooleanField()
     pdf_from_student=models.FileField(upload_to="pdf_student/",null=True,blank=True)
-    
+
+
+class Attendance (models.Model):
+    choices = (
+        (1,"present"),
+        (2,"leave"),
+        (3,"absent"),
+    )
+    student=models.ForeignKey(
+                                Student,
+                                related_name="student_attendance",
+                                on_delete=models.CASCADE,
+                                limit_choices_to={"user__account_type":User.Student},
+    )
+    day=models.DateField(auto_now_add=True)
+
+    attendance_status = models.CharField(
+        choices=choices,
+        max_length=10,
+        default="absent")

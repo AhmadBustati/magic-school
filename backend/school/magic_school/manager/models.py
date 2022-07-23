@@ -23,14 +23,13 @@ class Profile(models.Model):
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     father_name = models.CharField(max_length=30, null=True, blank=True)
+    mother_name = models.CharField(max_length=30,null=True,blank=True)
     certificates = models.CharField(max_length=100)
-    age = models.IntegerField()
+    job_title = models.CharField(max_length=100,null=True,blank=True)
+    address = models.CharField(max_length=100,null=True, blank=True)
     birthday = models.DateField()
     gender = models.CharField(choices=GENDER_TYPES, max_length=20, default=M)
     phone = PhoneNumberField(null=True, blank=True, unique=True)
-    title = models.CharField(max_length=30, null=True, blank=True)
-    classroom = models.ForeignKey(
-        Classroom, related_name='teacher_classroom', on_delete=models.CASCADE,null=True,blank=True)
     photo = models.ImageField(upload_to='photo', null=True, blank=True)
     user = models.ForeignKey(
         User,
@@ -89,6 +88,7 @@ class Feedback(models.Model):
     )
     type = models.CharField(choices=TYPE, max_length=20)
     text = models.TextField()
+    date = models.DateField(auto_now=True,null=True,blank=True)
 
 
 

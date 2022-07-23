@@ -1,17 +1,15 @@
 from cProfile import Profile
 from telnetlib import STATUS
-from unicodedata import name
-# from matplotlib.style import context
+
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.views import APIView
-from yaml import serialize
-from .models import Classroom, HomeWorkStudent,Profile,face_recognition
+from rest_framework.filters import SearchFilter
+from .models import  HomeWorkStudent,Profile,face_recognition,Attendance
 from .models import Student,Subject,Mark,HomeworkTeacher,DailyLessons
-from django.http import Http404
-from django.db.models import Q
-import numpy as np 
+
 from .serializers import (
                             StudentSerializer,
+                            StudentSerializerGET,
                             SubjectSerializer,
                             MarkSerializer,
                             HomeWorkeTeacherSerializer,
@@ -22,38 +20,60 @@ from .serializers import (
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponse,JsonResponse
-from rest_framework import status
-from django.db.models import Avg, Max, Min, Sum
+
+from django.http import JsonResponse
+
+
+def StudentAttendance(request,student_id):
+    queryset = Attendance.objects.all()
+    if  student_id:
+        present=queryset.filter(student=Student.objects.get(id=student_id),
+        attendance_status ="present").count()
+
+        absent=queryset.filter(student=Student.objects.get(id=student_id),
+        attendance_status ="absent").count()
+
+        leave=queryset.filter(student=Student.objects.get(id=student_id),
+        attendance_status ="leave").count()
+
+        response = {"present":present,
+                        "absent":absent,
+                        "leave":leave}
+
+
+        return JsonResponse(response)
+
 
 
 
 class StudentViewSet(ModelViewSet, GenericViewSet):
     permission_classes = [IsAuthenticated]
     queryset = Student.objects.all()
-    serializer_class = StudentSerializer
+    filter_backends=[SearchFilter]
+    search_fields=["first_name","last_name"]
     
+    def get_serializer_class(self):
+        if self.action == 'list' :
+            if self.request.GET.get('student'):
+                return StudentSerializerGET     
+        return StudentSerializer
+
     def get_serializer_context(self):
         return {"student":self.request.GET.get('student')}
-
+    
     def get_queryset(self):
         queryset=super(StudentViewSet,self).get_queryset()
         if self.request.GET.get('student'):
             return queryset.filter(id=self.request.GET.get('student'))
+        elif self.request.GET.get('classroom'):
+            return queryset.filter(classroom=self.request.GET.get('classroom'))
         return queryset
     
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        if request.GET.get("classroom"):
-            class_id = request.GET.get("classroom")
-            try:
-                classroom = Classroom.objects.get(pk=class_id)
-            except Classroom.DoesNotExist:
-                raise Http404("classroom does not exist")
-            queryset = queryset.filter(classroom=classroom)
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+    def update(self, request, *args, **kwargs):
+        return super(StudentViewSet,self).update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        return super(StudentViewSet,self).destroy(request, *args, **kwargs)   
 
     
             
@@ -97,8 +117,7 @@ class AvaregViews(ModelViewSet,GeneratorExit):
         if self.request.GET.get('student') and self.request.GET.get('subject'):
             queryset=queryset.filter(student=self.request.GET.get('student'),
                                         subject=self.request.GET.get('subject'),
-                                        )
-            #.aggregate(avge=(Sum("mark")/Sum("fullmark"))*100).get("avge",0.00)                            
+                                        )                          
             return  queryset      
         return  queryset  
                
@@ -154,41 +173,27 @@ class DailyLessonsViewSit(ModelViewSet,GenericViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class=DailyLessonsSerializer
     queryset=DailyLessons.objects.all()
-# هلأ أنا هون بدي بس الموظف هو يلي يكريت الجداول ماظبطت ما بعرف ليش؟؟؟؟
-    def perform_create(self, serializer):
-        user=self.request.user 
-        if user.account_type=="Employee": 
-            instance = serializer.save()
-
-    # def get_queryset(self):
-    #     queryset=super(DailyLessonsViewSit,self).get_queryset()
-    #     if self.request.GET.get("className"):
-    #         return queryset.filter(className=self.request.GET.get("className"))
-    #     elif self.request.GET.get("teacher"):
-    #         return queryset.filter(teacher=self.request.GET.get("teacher"))
-    #     return queryset  
-    # ############################### get program with user authentication ##############################     
     def get_queryset(self):
-        user=self.request.user
-        print("@@@@@@@@@@@@@@@@@",user)
         queryset=super(DailyLessonsViewSit,self).get_queryset()
-        print("@@@@@@@@@@@@@@@@@",queryset)
-        
-        if user.account_type=="teacher":
-            print("@@@@@@@@@@@@@@@@@",user.account_type)
-            return queryset.filter(teacher=Profile.objects.get(user_id=user.id))
-        elif  user.account_type=="student":
-            print("@@@@@@@@@@@@@@@@@",user.account_type) 
-            obj=Student.objects.get(user_id=user.id)
-            print("@@@@@@@@@@@@@@@@@",obj)  
-            return queryset.filter(className=obj.classroom)
+        if self.request.GET.get("className"):
+            return queryset.filter(className=self.request.GET.get("className"))
+        elif self.request.GET.get("teacher"):
+            return queryset.filter(teacher=self.request.GET.get("teacher"))
+        return queryset 
 
 class RecognizeFace(APIView):
     def post(self,request):
         im = request.data.get('face')
-        image = np.array(im)
+        # image = np.array(im)
         recognizer = face_recognition()
         queryset = Student.objects.all()
-        a = recognizer.recognize_face(image,queryset)
-        return Response(a)
+        id = recognizer.recognize_face(im,queryset)
+        if id == "not recognized":
+            return Response(id)
+        student_attendance =Attendance(
+            student=Student.objects.get(id=id),
+            attendance_status="present")
+        student_attendance.save()
+        return Response(id)
+    
     

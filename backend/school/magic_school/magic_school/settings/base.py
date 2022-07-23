@@ -6,13 +6,13 @@ from datetime import timedelta
 from os.path import abspath, basename, dirname, join, normpath
 from sys import path
 
-import environ
-import os 
+import environ 
 
 ########## PATH CONFIGURATION
 BASE_DIR = dirname(dirname(__file__) + "../../../")
-FACENET_DIR = join(BASE_DIR,'neural networks/face_recognition')
-#/facenet_keras.h5
+# FACENET_DIR = join(BASE_DIR,'neural networks/face_recognition')
+# QUESTION_GENERATOR = join(BASE_DIR,'neural networks\question_genrator\models')
+# TOKENIZER = join(BASE_DIR,"neural networks\question_genrator/tokenizer")
 # Absolute filesystem path to the config directory:
 
 CONFIG_ROOT = dirname(dirname(abspath(__file__)))
@@ -178,6 +178,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.locale.LocaleMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 
@@ -207,9 +208,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.messages",
     "kn_defaults.logging",
-    'rest_framework_simplejwt',
+    "rest_framework_simplejwt",
     "rest_framework",
     "rest_framework.authtoken",
+    "corsheaders",
 	"djvue",
     "manager",
     "student",
@@ -303,3 +305,6 @@ SIMPLE_JWT = {
 }
 
 SENTRY_DSN = env.str("SENTRY_DSN", "")
+
+ALLOWED_HOSTS = ["*"]
+CORS_ORIGIN_ALLOW_ALL = True

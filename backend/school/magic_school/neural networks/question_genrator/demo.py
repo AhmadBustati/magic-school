@@ -3,8 +3,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # disable tensorflow warnings
 import datetime
 from transformers import TFT5ForConditionalGeneration, T5Tokenizer
 import tensorflow as tf 
-model_path = "./model/save/"
-tokenizer_path = "tokenizer/tokenizer"
+model_path = "./models/"
+tokenizer_path = "./tokenizer/"
 
 
 class snapThatT5(TFT5ForConditionalGeneration):
