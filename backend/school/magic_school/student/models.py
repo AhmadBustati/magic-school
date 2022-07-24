@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinValueValidator,MaxValueValidator
 from manager.models import Profile,Classroom,Question
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth import get_user_model
@@ -229,7 +230,14 @@ class Answer(models.Model):
     student=models.ForeignKey(Student,on_delete=models.CASCADE)
     question=models.ForeignKey(Question,related_name="question",on_delete=models.CASCADE)
     answer=models.TextField()
-    star=models.IntegerField(null=True,blank=True ,default=0)
+    star=models.IntegerField(
+        null=True,
+        blank=True,
+        default=0,
+        validators=[
+            MaxValueValidator(5),
+            MinValueValidator(0)
+        ])
 
     def __str__(self):
         return self.answer
