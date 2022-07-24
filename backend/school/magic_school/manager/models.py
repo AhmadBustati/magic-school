@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Q
 
+
 from django_extensions.db.models import TimeStampedModel
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth import get_user_model
@@ -113,8 +114,10 @@ class QuizName(models.Model):
 
 
 class Question(models.Model):
-    question_text = models.CharField(max_length=512)
+    question_text = models.TextField()
     quiz = models.ForeignKey(QuizName, on_delete=models.CASCADE)
     approved = models.BooleanField(default=False)
     def __str__(self):
         return self.question_text
+
+

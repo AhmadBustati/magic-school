@@ -1,6 +1,6 @@
 from django.apps import AppConfig
-from transformers import T5Tokenizer, TFT5ForConditionalGeneration
-from django.conf import settings
+# from transformers import T5Tokenizer, TFT5ForConditionalGeneration
+# from django.conf import settings
 # import tensorflow as tf 
 
 # class snapThatT5(TFT5ForConditionalGeneration):

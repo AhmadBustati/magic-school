@@ -168,6 +168,12 @@ class QuestionGenerator(APIView):
         except:
             return HTTPResponse(status=status.HTTP_404_NOT_FOUND)
 
+    def get(self,request,id):
+        quiz_name = QuizName.objects.get(id=id)
+        questions = Question.objects.filter(quiz=quiz_name)
+        response = QuestionSerializer(questions,many=True)
+        return Response(response.data)
+
     def encode_text(self,text, tokenizer):
         encoded_text = tokenizer(
         text,

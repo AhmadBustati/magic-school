@@ -4,7 +4,7 @@ from dataclasses import fields
 from pyexpat import model
 from rest_framework import serializers
 from django.db.models import Avg, Max, Min, Sum
-from .models import Classroom ,Profile,Attendance
+from .models import Classroom ,Profile,Attendance,Answer
 
 
 from .models import HomeworkTeacher, Student,Subject,Mark,HomeWorkStudent,DailyLessons
@@ -156,7 +156,7 @@ class DailyLessonsSerializer(serializers.ModelSerializer):
         )        
 
 
-class AttendanceSerializer(serializers.Serializer):
+class CountSerializer(serializers.Serializer):
     attendance_status = serializers.CharField(max_length =10)
     count = serializers.IntegerField()
 
@@ -165,3 +165,12 @@ class MonthlyAttendance(serializers.Serializer):
     count = serializers.IntegerField()
     month = serializers.DateField()
 
+class AnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Answer
+        fields="__all__"
+
+class AttendanceSerializer(serializers.ModelSerializer): 
+    class Meta:
+        model = Attendance
+        fields = "__all__"

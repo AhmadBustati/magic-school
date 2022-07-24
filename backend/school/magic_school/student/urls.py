@@ -9,8 +9,10 @@ from .views import (
     HomeworkStudentViewSet,
     DailyLessonsViewSit,
     RecognizeFace,
+    AnswerView,
+    StudentAttendanceStatus,
     StudentAttendance,
-    StudentAttendanceMonthly
+    StudentAttendanceMonthly,
 )
 from rest_framework import routers
 
@@ -29,7 +31,11 @@ router.register("dailyLessones",DailyLessonsViewSit)
 urlpatterns =[
     path("",include(router.urls)),
     path("who/",RecognizeFace.as_view()),
+    path("Answer/",AnswerView.as_view()),
+    path("Answer/<int:id>/",AnswerView.as_view()),
+    path("student-absent/",StudentAttendanceStatus.as_view()),
+    path("student-absent/<int:id>/",StudentAttendanceStatus.as_view()),
     path("student-attendance/<int:student_id>/",StudentAttendance),
-    path("student-attendance-monthly/<int:student_id>/",StudentAttendanceMonthly)
+    path("student-attendance-monthly/<int:student_id>/",StudentAttendanceMonthly),
     ]
 

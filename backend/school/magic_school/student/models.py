@@ -1,6 +1,5 @@
 from django.db import models
-from manager.models import Profile
-from manager.models import Classroom
+from manager.models import Profile,Classroom,Question
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth import get_user_model
 from PIL import Image
@@ -225,3 +224,12 @@ class Attendance (models.Model):
         choices=choices,
         max_length=10,
         default="absent")
+
+class Answer(models.Model):
+    student=models.ForeignKey(Student,on_delete=models.CASCADE)
+    question=models.ForeignKey(Question,related_name="question",on_delete=models.CASCADE)
+    answer=models.TextField()
+    star=models.IntegerField(null=True,blank=True ,default=0)
+
+    def __str__(self):
+        return self.answer

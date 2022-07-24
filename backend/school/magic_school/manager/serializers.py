@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Classroom, Feedback, Holiday, Post, Profile,Message,Question
+from .models import Classroom, Feedback, Holiday, Post, Profile,Message,Question,QuizName
 
 from django.contrib.auth import get_user_model
 
@@ -120,3 +120,8 @@ class QuestionSerializer(serializers.ModelSerializer):
         model = Question
         fields = ('id','question_text')
 
+
+class QuizSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuizName
+        fields =('id','name','class_name','profile')

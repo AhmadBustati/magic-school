@@ -5,9 +5,15 @@ from django.db.models.functions import TruncMonth
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter
-from .models import  HomeWorkStudent,Profile,face_recognition,Attendance
-from .models import Student,Subject,Mark,HomeworkTeacher,DailyLessons
+from yaml import serialize
+from datetime import date
 
+from manager.models import QuizName
+from .models import  HomeWorkStudent,Profile,face_recognition,Attendance
+from .models import Student,Subject,Mark,HomeworkTeacher,DailyLessons,Answer
+from rest_framework import status
+
+from manager.serializers import QuizSerializer
 
 from .serializers import (
                             StudentSerializer,
@@ -20,12 +26,14 @@ from .serializers import (
                             AverageSerializer,
                             AttendanceSerializer,
                             MonthlyAttendance,
+                            AnswerSerializer,
+                            CountSerializer,
                             
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 
 def StudentAttendance(request,student_id):
     if  student_id:
@@ -33,7 +41,7 @@ def StudentAttendance(request,student_id):
         .values("attendance_status")
         .annotate(count=Count("attendance_status"))
         .order_by())
-        response = AttendanceSerializer(query,many=True)
+        response = CountSerializer(query,many=True)
         return JsonResponse(response.data,safe=False)
 
 def StudentAttendanceMonthly(request,student_id):
@@ -199,5 +207,82 @@ class RecognizeFace(APIView):
             attendance_status="present")
         student_attendance.save()
         return Response(id)
+
+class StudentAttendanceStatus(APIView):
+    def post(self,request):
+        query = Student.objects.exclude(id__in=Attendance.objects.filter(day=date.today()))
+        for i in range(len(query)):
+            student_attendance = Attendance(
+                student=query[i]
+            )
+            student_attendance.save()
+
+        return Response(len(query))
+
+    def put(self,request,id):
+        student=self.get_student(id)
+        student.attendance_status="leave"
+        student.save()
+        return Response("success",status = status.HTTP_202_ACCEPTED)
+        # serializer=AttendanceSerializer(student)
+        # if serializer.is_valid():
+        #     serializer.save()
+        #     return Response(serializer.data,status=status.HTTP_200_OK)
+        # return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+    def get_student(self,id):
+        try:
+            return Attendance.objects.get(student=id)
+        except:
+            return HttpResponse(status=status.HTTP_404_NOT_FOUND)
     
+class AnswerView(APIView):
+    def get_object(self,id):
+        try:
+            return Answer.objects.get(id=id)
+        except:
+            return HttpResponse(status=status.HTTP_404_NOT_FOUND)
+
+
+    def get (self,request,id=None):
+        if self.request.GET.get("teacher_id"):
+            response = QuizName.objects.filter(profile=self.request.GET.get("teacher_id"))
+            serializer = QuizSerializer(response,many=True)
+            return Response(serializer.data)
+
+        elif self.request.GET.get("class_id"):
+            response = QuizName.objects.filter(class_name=self.request.GET.get("class_id"))
+            serializer = QuizSerializer(response,many=True)
+            return Response(serializer.data)
+        
+        elif self.request.GET.get("quiz_id") and id is not None:
+            answer = Answer.objects.filter(student=id,question__quiz=self.request.GET.get("quiz_id"))
+            serializer = AnswerSerializer(answer,many=True)
+            return Response(serializer.data)
+        
+
+        answer = Answer.objects.filter(student=id)
+        serializer = AnswerSerializer(answer,many=True)
+        return Response(serializer.data)
+
+    def post(self,request):
+        serializer=AnswerSerializer(data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
     
+    def put(self,request,id):
+        answer=self.get_object(id)
+        serializer=AnswerSerializer(answer,data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+    
+

@@ -31,5 +31,6 @@ urlpatterns =[
     path("AdminNumber/",AdminNumber),
     path("StudentNumber/",StudentNumber),
     path("TeacherNumber/",TeacherNumber),
+     path("generate/",QuestionGenerator.as_view()),
     path("generate/<int:id>/",QuestionGenerator.as_view())
 ]
