@@ -1,11 +1,13 @@
 from cProfile import Profile
 from telnetlib import STATUS
-
+from django.db.models import Count
+from django.db.models.functions import TruncMonth 
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter
 from .models import  HomeWorkStudent,Profile,face_recognition,Attendance
 from .models import Student,Subject,Mark,HomeworkTeacher,DailyLessons
+
 
 from .serializers import (
                             StudentSerializer,
@@ -16,6 +18,8 @@ from .serializers import (
                             HomeWorkeStudentSerializer,
                             DailyLessonsSerializer,
                             AverageSerializer,
+                            AttendanceSerializer,
+                            MonthlyAttendance,
                             
 )
 from rest_framework.permissions import IsAuthenticated
@@ -23,25 +27,25 @@ from rest_framework.response import Response
 
 from django.http import JsonResponse
 
-
 def StudentAttendance(request,student_id):
-    queryset = Attendance.objects.all()
     if  student_id:
-        present=queryset.filter(student=Student.objects.get(id=student_id),
-        attendance_status ="present").count()
+        query = (Attendance.objects.filter(student=Student.objects.get(id=student_id))
+        .values("attendance_status")
+        .annotate(count=Count("attendance_status"))
+        .order_by())
+        response = AttendanceSerializer(query,many=True)
+        return JsonResponse(response.data,safe=False)
 
-        absent=queryset.filter(student=Student.objects.get(id=student_id),
-        attendance_status ="absent").count()
+def StudentAttendanceMonthly(request,student_id):
+    query = (Attendance.objects.filter(student=Student.objects.get(id=student_id))
+            .annotate(month=TruncMonth("day"))
+            .values("month")
+            .annotate(count=Count("attendance_status"))
+            .values("month","count","attendance_status")
+            .order_by("month"))
 
-        leave=queryset.filter(student=Student.objects.get(id=student_id),
-        attendance_status ="leave").count()
-
-        response = {"present":present,
-                        "absent":absent,
-                        "leave":leave}
-
-
-        return JsonResponse(response)
+    response = MonthlyAttendance(query,many=True)
+    return JsonResponse(response.data,safe=False)
 
 
 

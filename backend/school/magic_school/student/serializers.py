@@ -155,3 +155,13 @@ class DailyLessonsSerializer(serializers.ModelSerializer):
             "teacher",
         )        
 
+
+class AttendanceSerializer(serializers.Serializer):
+    attendance_status = serializers.CharField(max_length =10)
+    count = serializers.IntegerField()
+
+class MonthlyAttendance(serializers.Serializer):
+    attendance_status = serializers.CharField(max_length =10)
+    count = serializers.IntegerField()
+    month = serializers.DateField()
+
