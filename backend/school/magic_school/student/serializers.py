@@ -1,9 +1,11 @@
+from asyncio.windows_events import NULL
 from asyncore import write
 from cProfile import Profile
 from dataclasses import fields
 from pyexpat import model
 from rest_framework import serializers
 from django.db.models import Avg, Max, Min, Sum
+
 from .models import Classroom ,Profile,Attendance,Answer
 
 
@@ -127,6 +129,15 @@ class HomeWorkeTeacherSerializer(serializers.ModelSerializer):
             "date",
             "pdf_from_teacher",
         )
+    def create(self, validated_data):
+        obj = HomeworkTeacher.objects.create(**validated_data)
+        classroom=validated_data.get("classroom").id
+        queryset=Student.objects.filter(classroom=classroom)
+        for i in range (len(queryset)):
+            HomeWorkStudent.objects.create(homework=obj,student=queryset[i],status=False,pdf_from_student=NULL)
+        return  obj       
+
+
 
 class HomeWorkeStudentSerializer(serializers.ModelSerializer):
 # post وما بدي ادخلو بال get هون بدي رقم الطالب بس ينعرض بال 
@@ -139,6 +150,7 @@ class HomeWorkeStudentSerializer(serializers.ModelSerializer):
             "status",
             "pdf_from_student",
         )
+
 
 class DailyLessonsSerializer(serializers.ModelSerializer):
     className=serializers.SlugRelatedField(many=False, slug_field="name",queryset=Classroom.objects.all())

@@ -142,14 +142,7 @@ class HomeworkTeacherViewsSet(ModelViewSet,GenericViewSet):
     def perform_create(self, serializer):
         user=self.request.user  
         instance = serializer.save(teacher=Profile.objects.get(user_id=user.id))
-########################  to get with teacher id  && /?classroom= #######################
-    # def get_queryset(self):
-    #     queryset=super(HomeworkTeacherViewsSet,self).get_queryset()
-    #     if self.request.GET.get("teacher"):
-    #         return queryset.filter(teacher=self.request.GET.get("teacher"))
-    #     elif self.request.GET.get("classroom"):
-    #        return queryset.filter(classroom=self.request.GET.get("classroom"))
-    #     return queryset 
+ 
 ########################  to get with authentication user && /?classroom= #######################
     def get_queryset(self):
         queryset=super(HomeworkTeacherViewsSet,self).get_queryset()
@@ -158,7 +151,6 @@ class HomeworkTeacherViewsSet(ModelViewSet,GenericViewSet):
         else :
             user=self.request.user  
             return HomeworkTeacher.objects.filter(teacher=Profile.objects.get(user_id=user.id))
-
 
 
 
