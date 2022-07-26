@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter
 from yaml import serialize
 from datetime import date
+import numpy as np 
 
 from manager.models import QuizName
 from .models import  HomeWorkStudent,Profile,face_recognition,Attendance
@@ -188,10 +189,10 @@ class DailyLessonsViewSit(ModelViewSet,GenericViewSet):
 class RecognizeFace(APIView):
     def post(self,request):
         im = request.data.get('face')
-        # image = np.array(im)
+        image = np.array(im)
         recognizer = face_recognition()
         queryset = Student.objects.all()
-        id = recognizer.recognize_face(im,queryset)
+        id = recognizer.recognize_face(image,queryset)
         if id == "not recognized":
             return Response(id)
         student_attendance =Attendance(

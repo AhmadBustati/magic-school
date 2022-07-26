@@ -39,9 +39,9 @@ class face_recognition:
         return face_features
 
     def recognize_face(self,image,queryset):
-        im = Image.open(image)
-        photo = np.array(im)
-        face_features = self.get_face_features(photo)
+        # im = Image.open(image)
+        # photo = np.array(im)
+        face_features = self.get_face_features(image,recognized=True)
         diff = 100
         for i in range(len(queryset)):
             if queryset[i]._face_features is None:
@@ -50,7 +50,7 @@ class face_recognition:
             a = np.linalg.norm(im-face_features)
             if a<diff:
                 diff = a
-                id = queryset[i].id
+                id = queryset[i].first_name
 
         if diff>0.8 :
             return "not recognized"
