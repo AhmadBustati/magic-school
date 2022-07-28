@@ -1,4 +1,6 @@
 from rest_framework import serializers
+
+from student.models import Answer, Student
 from .models import Classroom, Feedback, Holiday, Post, Profile,Message,Question,QuizName
 
 from django.contrib.auth import get_user_model
@@ -119,6 +121,13 @@ class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = ('id','question_text')
+    def create(self, validated_data):
+        obj = QuestionSerializer.objects.create(**validated_data)
+        classroom=obj.quiz.class_name
+        queryset=Student.objects.filter(classroom=classroom)
+        for i in range (len(queryset)):
+            Answer.objects.create(student=queryset[i],question=obj)
+        return  obj   
 
 
 class QuizSerializer(serializers.ModelSerializer):

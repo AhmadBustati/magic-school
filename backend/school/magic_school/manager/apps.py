@@ -46,6 +46,7 @@ class snapThatT5(TFT5ForConditionalGeneration):
 
 
 
+
 class ManagerConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'manager'

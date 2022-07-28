@@ -229,7 +229,7 @@ class Attendance (models.Model):
 class Answer(models.Model):
     student=models.ForeignKey(Student,on_delete=models.CASCADE)
     question=models.ForeignKey(Question,related_name="question",on_delete=models.CASCADE)
-    answer=models.TextField()
+    answer=models.TextField(null=True,blank=True)
     star=models.IntegerField(
         null=True,
         blank=True,

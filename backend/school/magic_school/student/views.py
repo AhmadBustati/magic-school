@@ -133,8 +133,7 @@ class AvaregViews(ModelViewSet,GeneratorExit):
                                         )                          
             return  queryset      
         return  queryset  
-               
-                          
+                                     
 class HomeworkTeacherViewsSet(ModelViewSet,GenericViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = HomeWorkeTeacherSerializer 
@@ -153,8 +152,6 @@ class HomeworkTeacherViewsSet(ModelViewSet,GenericViewSet):
             user=self.request.user  
             return HomeworkTeacher.objects.filter(teacher=Profile.objects.get(user_id=user.id))
 
-
-
 class HomeworkStudentViewSet(ModelViewSet,GenericViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class=HomeWorkeStudentSerializer               
@@ -171,9 +168,6 @@ class HomeworkStudentViewSet(ModelViewSet,GenericViewSet):
             return queryset.filter(homework=self.request.GET.get("homework"))
         return queryset 
         
-     
-
-
 class DailyLessonsViewSit(ModelViewSet,GenericViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class=DailyLessonsSerializer
@@ -202,7 +196,7 @@ class RecognizeFace(APIView):
         return Response(id)
 
 class StudentAttendanceStatus(APIView):
-    def post(self,request):
+    def get(self,request):
         query = Student.objects.exclude(id__in=Attendance.objects.filter(day=date.today()))
         for i in range(len(query)):
             student_attendance = Attendance(
@@ -230,6 +224,8 @@ class StudentAttendanceStatus(APIView):
         except:
             return HttpResponse(status=status.HTTP_404_NOT_FOUND)
     
+
+
 class AnswerView(APIView):
     def get_object(self,id):
         try:
@@ -253,7 +249,6 @@ class AnswerView(APIView):
             answer = Answer.objects.filter(student=id,question__quiz=self.request.GET.get("quiz_id"))
             serializer = AnswerSerializer(answer,many=True)
             return Response(serializer.data)
-        
 
         answer = Answer.objects.filter(student=id)
         serializer = AnswerSerializer(answer,many=True)
