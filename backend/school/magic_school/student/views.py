@@ -1,4 +1,5 @@
 from cProfile import Profile
+import json
 from telnetlib import STATUS
 from django.db.models import Count
 from django.db.models.functions import TruncMonth 
@@ -46,15 +47,40 @@ def StudentAttendance(request,student_id):
         return JsonResponse(response.data,safe=False)
 
 def StudentAttendanceMonthly(request,student_id):
-    query = (Attendance.objects.filter(student=Student.objects.get(id=student_id))
+    queryset = (Attendance.objects.filter(student=Student.objects.get(id=student_id))
             .annotate(month=TruncMonth("day"))
             .values("month")
             .annotate(count=Count("attendance_status"))
             .values("month","count","attendance_status")
             .order_by("month"))
+    response_lst=[]
+    response_json={}
+    for query in queryset:
+        a={}# A dictionary to update the list which is used to get over the pointers
+        month = query["month"].strftime("%b")#Get the string of the month
+        attendance_status = query["attendance_status"]# present,absent,or leave
+        if "month" in response_json :
+            if response_json["month"] ==month:
+                response_json[attendance_status] = query["count"]
 
-    response = MonthlyAttendance(query,many=True)
-    return JsonResponse(response.data,safe=False)
+            else:
+                a.update(response_json)# not to update the values in the list 
+                response_lst.append(a)
+                response_json["month"]=month
+                response_json[attendance_status] = query["count"]
+
+        
+        else:
+            response_json["month"]=month
+            response_json[attendance_status] = query["count"]
+
+    response_lst.append(response_json)
+    
+        
+
+
+    # response = MonthlyAttendance(respons,many=True)
+    return JsonResponse(response_lst,safe=False)
 
 
 
