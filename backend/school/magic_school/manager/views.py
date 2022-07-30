@@ -151,12 +151,17 @@ class QuestionGenerator(APIView):
             input_ids, attention_mask = self.encode_text(t, tokenizer)
             outputs = model.generate(input_ids,attention_mask=attention_mask)
             question= tokenizer.decode(outputs[0],skip_special_tokens=True)
-            Question(question_text=question, quiz=a).save()
-
+            a=Question(question_text=question, quiz=a)
+            serializer=QuestionSerializer(a,many=True)
+            if serializer.is_valid():
+                serializer.save()
+        
         query = Question.objects.filter(quiz=a)
         serializer = QuestionSerializer(query ,many=True)
         return Response({"questions":serializer.data})
 
+    
+    
     def delete(self,request,id):
         question = self.get_object(id)
         question.delete()

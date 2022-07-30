@@ -121,6 +121,7 @@ class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = ('id','question_text')
+    
     def create(self, validated_data):
         obj = QuestionSerializer.objects.create(**validated_data)
         classroom=obj.quiz.class_name
