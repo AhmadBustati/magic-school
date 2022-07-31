@@ -112,7 +112,6 @@ class MessageViewSet(ModelViewSet, GenericViewSet):
     def perform_create(self, serializer):
         user=self.request.user  
         instance = serializer.save(sender=User.objects.get(id=user.id))
-
     ################ get message by user authentication ###########################    
     def get_queryset(self):
         queryset=super(MessageViewSet,self).get_queryset()

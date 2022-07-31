@@ -244,11 +244,11 @@ class Answer(models.Model):
         return self.answer
 
 
-    class Activity(models.Model):
-        student=models.ForeignKey(Student,on_delete=models.CASCADE)
-        subject=models.ForeignKey(Subject,on_delete=models.CASCADE)
-        description=models.TextField()
-        star=models.IntegerField(null=True,blank=True)
-        date=models.DateField(auto_now_add=True)
-        condition=models.BooleanField(default = True)
+class Activity(models.Model):
+    student=models.ForeignKey(Student,on_delete=models.CASCADE)
+    subject=models.ForeignKey(Subject,on_delete=models.CASCADE)
+    description=models.TextField()
+    star=models.IntegerField(null=True,blank=True)
+    date=models.DateField(auto_now_add=True)
+    condition=models.BooleanField(default = True)
         

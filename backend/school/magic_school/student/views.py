@@ -2,7 +2,8 @@ from cProfile import Profile
 import json
 from telnetlib import STATUS
 from django.db.models import Count
-from django.db.models.functions import TruncMonth 
+from django.db.models.functions import TruncMonth
+from django.urls import is_valid_path 
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
 from rest_framework.views import APIView
 from rest_framework.filters import SearchFilter
@@ -11,8 +12,9 @@ from datetime import date
 import numpy as np 
 
 from manager.models import QuizName
-from .models import  HomeWorkStudent,Profile,face_recognition,Attendance,Activity
-from .models import Student,Subject,Mark,HomeworkTeacher,DailyLessons,Answer
+from .models import  HomeWorkStudent,Profile,face_recognition,Attendance
+from .models import Student,Subject,Mark,HomeworkTeacher,DailyLessons,Answer,Activity
+
 from rest_framework import status
 
 from manager.serializers import QuizSerializer
@@ -55,7 +57,7 @@ def StudentAttendanceMonthly(request,student_id):
             .values("month","count","attendance_status")
             .order_by("month"))
     response_lst=[]
-    response_json={"leave":0,"absent":0,"presernt":0}
+    response_json={"leave":0,"absent":0,"present":0}
     for query in queryset:
         a={}# A dictionary to update the list which is used to get over the pointers
         month = query["month"].strftime("%b")#Get the string of the month
@@ -206,6 +208,23 @@ class DailyLessonsViewSit(ModelViewSet,GenericViewSet):
         elif self.request.GET.get("teacher"):
             return queryset.filter(teacher=self.request.GET.get("teacher"))
         return queryset 
+    def create(self,request,*arg,**Kwargs):
+        item=request.data
+        if isinstance(item,list):
+            serialize=self.serializer_class(instance="",
+                                            data=item,
+                                            many=True,
+                                            context={
+                                                "request":self.request,
+                                            }
+                                            )
+            if serialize.is_valid(raise_exception=True):
+                serialize.save()
+                return Response(serialize.data,status=status.HTTP_200_OK)
+            return Response(serialize.errors,status=status.HTTP_400_BAD_REQUEST)    
+        elif isinstance(item,dict):
+            return self.create(request,*arg,**Kwargs)
+
 
 class RecognizeFace(APIView):
     def post(self,request):

@@ -48,6 +48,7 @@ class ProfileSerializer(serializers.ModelSerializer):
             'password',
             "account_type",
             "address",
+            "class_room",
         )
         
     def create(self, validated_data):
@@ -83,6 +84,7 @@ class SerrializerManagerGET(serializers.ModelSerializer):
             'password',
             "account_type",
             "address",
+            "class_room",
         )
     def get_username(self,obj):
         obj=Profile.objects.get(id=self.context["profile"]).user.username

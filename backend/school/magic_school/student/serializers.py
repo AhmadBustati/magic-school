@@ -152,20 +152,31 @@ class HomeWorkeStudentSerializer(serializers.ModelSerializer):
         )
 
 
+class DailyLessonsListSerializer(serializers.ListSerializer):
+     def update(self, instance, validated_data):
+        ret = []
+        for data in validated_data:
+            if data.get('id') not in {'', None}:
+                DailyLessons.objects.filter(id=data['id']).update(**data)
+                ret.append(data)
+            else:
+                ret.append(DailyLessons.objects.create(**data))
+        return ret 
 class DailyLessonsSerializer(serializers.ModelSerializer):
     className=serializers.SlugRelatedField(many=False, slug_field="name",queryset=Classroom.objects.all())
-    subject=serializers.SlugRelatedField(many=False, slug_field="subject_name",queryset=Subject.objects.all())
+    
     teacher=serializers.SlugRelatedField(many=False, slug_field="first_name",queryset=Profile.objects.filter(user__account_type="Teacher"))
     class Meta:
         model=DailyLessons
+        list_serializer_class = DailyLessonsListSerializer
         fields=(
             "id",
             "className",
             "day",
             "period",
-            "subject",
             "teacher",
-        )        
+        )    
+           
 
 
 class CountSerializer(serializers.Serializer):
