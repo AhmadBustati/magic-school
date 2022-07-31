@@ -10,9 +10,11 @@ import environ
 
 ########## PATH CONFIGURATION
 BASE_DIR = dirname(dirname(__file__) + "../../../")
-FACENET_DIR = join(BASE_DIR,'neural networks/face_recognition')
+# FACENET_DIR = join(BASE_DIR,'neural networks/face_recognition')
 # QUESTION_GENERATOR = join(BASE_DIR,'neural networks\question_genrator\models')
-TOKENIZER = join(BASE_DIR,"neural networks\question_genrator/tokenizer")
+# TOKENIZER = join(BASE_DIR,"neural networks\question_genrator/tokenizer")
+
+
 # Absolute filesystem path to the config directory:
 
 CONFIG_ROOT = dirname(dirname(abspath(__file__)))

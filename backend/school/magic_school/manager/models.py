@@ -39,7 +39,7 @@ class Profile(models.Model):
         limit_choices_to=Q(account_type=User.Employee) | Q(
             account_type=User.Teacher),
     )
-
+    class_room=models.ForeignKey(Classroom,on_delete=models.CASCADE)
     def str(self):
         return self.first_name
 

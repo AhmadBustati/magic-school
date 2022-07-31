@@ -11,7 +11,7 @@ from datetime import date
 import numpy as np 
 
 from manager.models import QuizName
-from .models import  HomeWorkStudent,Profile,face_recognition,Attendance
+from .models import  HomeWorkStudent,Profile,face_recognition,Attendance,Activity
 from .models import Student,Subject,Mark,HomeworkTeacher,DailyLessons,Answer
 from rest_framework import status
 
@@ -30,6 +30,7 @@ from .serializers import (
                             MonthlyAttendance,
                             AnswerSerializer,
                             CountSerializer,
+                            ActivitySerializer,
                             
 )
 from rest_framework.permissions import IsAuthenticated
@@ -54,7 +55,7 @@ def StudentAttendanceMonthly(request,student_id):
             .values("month","count","attendance_status")
             .order_by("month"))
     response_lst=[]
-    response_json={}
+    response_json={"leave":0,"absent":0,"presernt":0}
     for query in queryset:
         a={}# A dictionary to update the list which is used to get over the pointers
         month = query["month"].strftime("%b")#Get the string of the month
@@ -296,7 +297,10 @@ class AnswerView(APIView):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-
+class ActivityViewSet(ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    serializer_class=ActivitySerializer               
+    queryset=Activity.objects.all()    
 
     
 

@@ -1,3 +1,4 @@
+from msilib.schema import Condition
 from django.db import models
 from django.core.validators import MinValueValidator,MaxValueValidator
 from manager.models import Profile,Classroom,Question
@@ -162,7 +163,7 @@ class DailyLessons(models.Model):
         (seven, '7'),
     )
     className = models.ForeignKey(Classroom, on_delete=models.CASCADE)
-    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    # subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     teacher=models.ForeignKey(
         Profile,
         related_name="teacher_daelylessons",
@@ -241,3 +242,13 @@ class Answer(models.Model):
 
     def __str__(self):
         return self.answer
+
+
+    class Activity(models.Model):
+        student=models.ForeignKey(Student,on_delete=models.CASCADE)
+        subject=models.ForeignKey(Subject,on_delete=models.CASCADE)
+        description=models.TextField()
+        star=models.IntegerField(null=True,blank=True)
+        date=models.DateField(auto_now_add=True)
+        condition=models.BooleanField(default = True)
+        

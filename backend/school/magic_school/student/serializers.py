@@ -9,7 +9,7 @@ from django.db.models import Avg, Max, Min, Sum
 from .models import Classroom ,Profile,Attendance,Answer
 
 
-from .models import HomeworkTeacher, Student,Subject,Mark,HomeWorkStudent,DailyLessons
+from .models import HomeworkTeacher, Student,Subject,Mark,HomeWorkStudent,DailyLessons,Activity
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -183,6 +183,23 @@ class AnswerSerializer(serializers.ModelSerializer):
         fields="__all__"
 
 class AttendanceSerializer(serializers.ModelSerializer): 
+
     class Meta:
         model = Attendance
         fields = "__all__"
+
+
+
+class ActivitySerializer(serializers.ModelSerializer):
+    student=serializers.SlugRelatedField(many=False, slug_field="first_name",queryset=Student.objects.all())
+    subject=serializers.SlugRelatedField(many=False, slug_field="subject_name",queryset=Subject.objects.all())
+    class Meta:
+        model=Activity
+        fields=(
+            "student",
+            "subject",
+            "description",
+            "star",
+            "date",
+            "condition",
+        )        

@@ -11,6 +11,7 @@ from .views import (
     RecognizeFace,
     AnswerView,
     StudentAttendanceStatus,
+    ActivityViewSet,
     StudentAttendance,
     StudentAttendanceMonthly,
 )
@@ -26,6 +27,8 @@ router.register("Avareg",AvaregViews)
 router.register("homeworkteacher",HomeworkTeacherViewsSet)
 router.register("homeworkStudent",HomeworkStudentViewSet)
 router.register("dailyLessones",DailyLessonsViewSit)
+router.register("Activity",ActivityViewSet)
+
 # urlpatterns = router.urls
 
 urlpatterns =[
