@@ -35,14 +35,17 @@ class face_recognition:
         image = self.resize_image(image)
         image = image/255.0
         image = np.expand_dims(image,axis=0)
+        image = image.reshape(1,160,160,3)
         face_features = self.model.predict(image)[0]
         face_features/=np.linalg.norm(face_features)
         return face_features
 
     def recognize_face(self,image,queryset):
-        # im = Image.open(image)
-        # photo = np.array(im)
-        face_features = self.get_face_features(image,recognized=True)
+        if image is None :
+            return "No image was provided"
+        im = Image.open(image).convert("RGB")
+        photo = np.array(im)
+        face_features = self.get_face_features(photo,recognized=True)
         diff = 100
         for i in range(len(queryset)):
             if queryset[i]._face_features is None:
@@ -51,12 +54,17 @@ class face_recognition:
             a = np.linalg.norm(im-face_features)
             if a<diff:
                 diff = a
-                id = queryset[i].first_name
+                id = queryset[i].id
 
         if diff>0.8 :
             return "not recognized"
         else : 
             return id
+
+class Subject(models.Model):
+    subject_name = models.CharField(max_length=20)
+    def __str__(self):
+        return self.subject_name
 
 
 class Student(models.Model):
@@ -97,19 +105,6 @@ class Student(models.Model):
     
     def __str__(self):
         return self.first_name
-
-class Subject(models.Model):
-    subject_name = models.CharField(max_length=20)
-
-    def __str__(self):
-        return self.subject_name
-
-
-
-
-
-
-
 
 
 class Mark(models.Model):
@@ -163,7 +158,7 @@ class DailyLessons(models.Model):
         (seven, '7'),
     )
     className = models.ForeignKey(Classroom, on_delete=models.CASCADE)
-    # subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     teacher=models.ForeignKey(
         Profile,
         related_name="teacher_daelylessons",
@@ -226,6 +221,10 @@ class Attendance (models.Model):
         choices=choices,
         max_length=10,
         default="absent")
+        
+    class Meta:
+        unique_together = (("student", "day"),)
+
 
 class Answer(models.Model):
     student=models.ForeignKey(Student,on_delete=models.CASCADE)

@@ -150,10 +150,10 @@ class QuestionGenerator(APIView):
             input_ids, attention_mask = self.encode_text(t, tokenizer)
             outputs = model.generate(input_ids,attention_mask=attention_mask)
             question= tokenizer.decode(outputs[0],skip_special_tokens=True)
-            a=Question(question_text=question, quiz=a)
-            serializer=QuestionSerializer(a,many=True)
-            if serializer.is_valid():
-                serializer.save()
+            Question(question_text=question, quiz=a).save()
+            # serializer=QuestionSerializer(a,many=True)
+            # if serializer.is_valid():
+            #     serializer.save()
         
         query = Question.objects.filter(quiz=a)
         serializer = QuestionSerializer(query ,many=True)

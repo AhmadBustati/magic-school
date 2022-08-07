@@ -4,7 +4,6 @@ from .views import (
     StudentViewSet,
     SubjectViewSet,
     MarkViewset,
-    AvaregViews,
     HomeworkTeacherViewsSet,
     HomeworkStudentViewSet,
     DailyLessonsViewSit,
@@ -14,6 +13,8 @@ from .views import (
     ActivityViewSet,
     StudentAttendance,
     StudentAttendanceMonthly,
+    AvaregViews,
+    studentBirthday,
 )
 from rest_framework import routers
 
@@ -23,7 +24,6 @@ router = routers.DefaultRouter()
 router.register("student", StudentViewSet)
 router.register("subject",SubjectViewSet)
 router.register("mark",MarkViewset)
-router.register("Avareg",AvaregViews)
 router.register("homeworkteacher",HomeworkTeacherViewsSet)
 router.register("homeworkStudent",HomeworkStudentViewSet)
 router.register("dailyLessones",DailyLessonsViewSit)
@@ -40,5 +40,7 @@ urlpatterns =[
     path("student-absent/<int:id>/",StudentAttendanceStatus.as_view()),
     path("student-attendance/<int:student_id>/",StudentAttendance),
     path("student-attendance-monthly/<int:student_id>/",StudentAttendanceMonthly),
+    path("Avareg/<int:student_id>/",AvaregViews),
+    path("birthday/<int:id>/",studentBirthday)
     ]
 

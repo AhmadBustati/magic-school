@@ -6,7 +6,9 @@ from django_extensions.db.models import TimeStampedModel
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth import get_user_model
 
+
 User = get_user_model()
+
 
 
 class Classroom(models.Model):
@@ -40,6 +42,7 @@ class Profile(models.Model):
             account_type=User.Teacher),
     )
     class_room=models.ForeignKey(Classroom,on_delete=models.CASCADE)
+    
     def str(self):
         return self.first_name
 

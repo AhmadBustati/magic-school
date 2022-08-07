@@ -1,7 +1,7 @@
 from cProfile import Profile
 import json
 from telnetlib import STATUS
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.db.models.functions import TruncMonth
 from django.urls import is_valid_path 
 from rest_framework.viewsets import ModelViewSet, GenericViewSet
@@ -34,11 +34,14 @@ from .serializers import (
                             CountSerializer,
                             ActivitySerializer,
                             
+                            
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from django.http import HttpResponse, JsonResponse
+
+
 
 def StudentAttendance(request,student_id):
     if  student_id:
@@ -78,13 +81,16 @@ def StudentAttendanceMonthly(request,student_id):
             response_json[attendance_status] = query["count"]
 
     response_lst.append(response_json)
-    
-        
-
-
     # response = MonthlyAttendance(respons,many=True)
     return JsonResponse(response_lst,safe=False)
 
+def studentBirthday(request,id):
+    birthday = Student.objects.get(id=id).birthday
+    today = date.today()
+    if today.day == birthday.day and today.month == birthday.month:
+        return Response("Happy birthday")
+    else :
+        return Response("tough luck")
 
 
 
@@ -144,24 +150,15 @@ class MarkViewset(ModelViewSet,GenericViewSet):
  
 
 
-class AvaregViews(ModelViewSet,GeneratorExit):
-    permission_classes = [IsAuthenticated]
-    queryset=Mark.objects.all()
-    serializer_class =AverageSerializer
-    
-
-    def get_serializer_context(self):
-        return {"student":self.request.GET.get('student'),"subject":self.request.GET.get('subject') }
-
-
-    def get_queryset(self):
-        queryset=super(AvaregViews,self).get_queryset()
-        if self.request.GET.get('student') and self.request.GET.get('subject'):
-            queryset=queryset.filter(student=self.request.GET.get('student'),
-                                        subject=self.request.GET.get('subject'),
-                                        )                          
-            return  queryset      
-        return  queryset  
+def  AvaregViews(request,student_id):
+    if student_id :
+        queryset=(Mark.objects.filter(student=student_id)
+                    .values("subject")
+                    .annotate(average=(Sum("mark")/Sum("fullmark"))*100)
+                    )
+        print(queryset)
+        serialize=AverageSerializer(queryset,many=True)
+        return JsonResponse(serialize.data,safe=False)
                                      
 class HomeworkTeacherViewsSet(ModelViewSet,GenericViewSet):
     permission_classes = [IsAuthenticated]
@@ -201,6 +198,7 @@ class DailyLessonsViewSit(ModelViewSet,GenericViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class=DailyLessonsSerializer
     queryset=DailyLessons.objects.all()
+
     def get_queryset(self):
         queryset=super(DailyLessonsViewSit,self).get_queryset()
         if self.request.GET.get("className"):
@@ -208,6 +206,7 @@ class DailyLessonsViewSit(ModelViewSet,GenericViewSet):
         elif self.request.GET.get("teacher"):
             return queryset.filter(teacher=self.request.GET.get("teacher"))
         return queryset 
+
     def create(self,request,*arg,**Kwargs):
         item=request.data
         if isinstance(item,list):
@@ -229,11 +228,14 @@ class DailyLessonsViewSit(ModelViewSet,GenericViewSet):
 class RecognizeFace(APIView):
     def post(self,request):
         im = request.data.get('face')
-        image = np.array(im)
+        # print(im)
+        # image = np.array(im)
         recognizer = face_recognition()
         queryset = Student.objects.all()
-        id = recognizer.recognize_face(image,queryset)
+        id = recognizer.recognize_face(im,queryset)
         if id == "not recognized":
+            return Response(id)
+        elif id == "No image was provided":
             return Response(id)
         student_attendance =Attendance(
             student=Student.objects.get(id=id),
@@ -301,12 +303,22 @@ class AnswerView(APIView):
         return Response(serializer.data)
 
     def post(self,request):
-        serializer=AnswerSerializer(data = request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-    
+        item=request.data
+        if isinstance(item,list):
+            serializer=AnswerSerializer(instance="",
+                                            data=item,
+                                            many=True,
+                                            context={
+                                                "request":self.request,
+                                            }
+                                            )
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data,status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        elif isinstance(item,dict):
+            return self.post(self,request)
+            
     def put(self,request,id):
         answer=self.get_object(id)
         serializer=AnswerSerializer(answer,data=request.data)

@@ -96,24 +96,8 @@ class MarkSerializer(serializers.ModelSerializer):
         )
 
 class AverageSerializer(serializers.ModelSerializer):
-    average=serializers.SerializerMethodField()
-    subject=serializers.SerializerMethodField()
-    class Meta:
-        model=Mark
-        fields=(
-            "subject",
-            "average",
-        )
-
-    def get_average(self,obj):
-        avg=Mark.objects.filter(
-            student=self.context["student"],
-            subject=self.context["subject"]).aggregate(avge=(Sum("mark")/Sum("fullmark"))*100).get("avge",0.00)  
-        return avg
-    def get_subject(self,obj):
-        obj=Subject.objects.get(id=self.context["subject"])
-        return obj.subject_name
-
+    subject=serializers.CharField(max_length =40)
+    average=serializers.IntegerField()
         
 
 class HomeWorkeTeacherSerializer(serializers.ModelSerializer):
@@ -162,10 +146,13 @@ class DailyLessonsListSerializer(serializers.ListSerializer):
             else:
                 ret.append(DailyLessons.objects.create(**data))
         return ret 
+
+
+
 class DailyLessonsSerializer(serializers.ModelSerializer):
     className=serializers.SlugRelatedField(many=False, slug_field="name",queryset=Classroom.objects.all())
-    
     teacher=serializers.SlugRelatedField(many=False, slug_field="first_name",queryset=Profile.objects.filter(user__account_type="Teacher"))
+    subject=serializers.SlugRelatedField(many=False, slug_field="subject_name",queryset=Subject.objects.all())
     class Meta:
         model=DailyLessons
         list_serializer_class = DailyLessonsListSerializer
@@ -175,8 +162,9 @@ class DailyLessonsSerializer(serializers.ModelSerializer):
             "day",
             "period",
             "teacher",
+            "subject",
         )    
-           
+
 
 
 class CountSerializer(serializers.Serializer):
@@ -188,8 +176,20 @@ class MonthlyAttendance(serializers.Serializer):
     count = serializers.IntegerField()
     month = serializers.DateField()
 
+class AnswerListSerializer(serializers.ListSerializer):
+     def update(self, instance, validated_data):
+        ret = []
+        for data in validated_data:
+            if data.get('id') not in {'', None}:
+                Answer.objects.filter(id=data['id']).update(**data)
+                ret.append(data)
+            else:
+                ret.append(Answer.objects.create(**data))
+        return ret 
+
 class AnswerSerializer(serializers.ModelSerializer):
     class Meta:
+        list_serializer_class = AnswerListSerializer
         model=Answer
         fields="__all__"
 
