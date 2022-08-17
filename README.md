@@ -1,6 +1,12 @@
 # magic-school
 This project aims to ease  the communication between a student's parent, and the school board  
 
+# Usage 
+* download the following [rar] (https://drive.google.com/file/d/1TMoA0ZWVqcg24qBH6F_86iAhf1zBJDej/view?usp=sharing) and extract to .\backend\school\magic_school\neural networks\question_genrator\models (create the models folder) 
+* pip install -r to every file in backend\school\requirements 
+* pip instaal -r .\backend\school\magic_school\neural networks\question_genrator\requirements.txt 
+* go to backend\school\magic_school and type python manage.py runserver the server then should be up and running
+
 ## Mobile 
 It has two mobile : one for the teacher, and the other for  the parents. Developed using Java by [Mahmoud Allouh](https://github.com/kanfoush) 
 ### The teacher can  : 
